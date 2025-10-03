@@ -29,7 +29,7 @@
     }
 
     let data = loadData();
-    if(data.dailyUsage >= ){
+    if(data.dailyUsage >= 7){
       showResult('🚫 Daily limit reached (7 Likes only).',true);
       return;
     }
