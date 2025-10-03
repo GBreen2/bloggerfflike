@@ -29,8 +29,8 @@
     }
 
     let data = loadData();
-    if(data.dailyUsage >= 3){
-      showResult('🚫 Daily limit reached (3 Likes only).',true);
+    if(data.dailyUsage >= 5){
+      showResult('🚫 Daily limit reached (5 Likes only).',true);
       return;
     }
 
@@ -68,7 +68,7 @@
           '👍 Likes Before: '+(result.LikesbeforeCommand||"N/A")+'\n'+
           '📈 Likes Given: '+(result.LikesGivenByAPI||"N/A")+'\n'+
           '🔋 Total Likes: '+(result.LikesafterCommand||"N/A")+'\n'+
-          '📊 Daily Usage: '+data.dailyUsage+'/3\n\n'+
+          '📊 Daily Usage: '+data.dailyUsage+'/5\n\n'+
           '🖥️ Powered By: V122'
         , false);
       }
