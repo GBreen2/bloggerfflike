@@ -1,10 +1,14 @@
-// like-sender.js (GitHub-ready) 
+// like-sender.js
 (function(){
   const sendBtn = document.getElementById('sendBtn');
   const resultBox = document.getElementById('result');
   const LS_KEY = 'ff_like_sender_data';
-  const MAX_DAILY = 3; // <-- use this everywhere
+  const MAX_DAILY = 5;
+  const SITE_TOKEN = 'my-secret-token'; // তোমার site token
+  const CHECK_API  = 'https://blogger-cheak2.vercel.app/api/check';
+  const LIKE_API   = 'https://apiblogproxy.vercel.app/api/like';
 
+  // localStorage data
   function loadData() {
     try {
       let data = localStorage.getItem(LS_KEY);
@@ -13,29 +17,35 @@
       return { dailyUsage: 0, uidTimestamps: {} };
     }
   }
+  function saveData(data){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
 
-  function saveData(data) {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-  }
-
-  function resetResult() {
-    resultBox.style.display = 'none';
-    resultBox.className = 'result';
-    resultBox.innerHTML = '';
-  }
-
-  function showResult(html, isError=false) {
-    resultBox.style.display = 'block';
-    resultBox.className = 'result' + (isError ? ' error' : '');
-    // we expect html (with <br>) so set innerHTML directly
+  function resetResult(){ resultBox.style.display='none'; resultBox.className='result'; resultBox.innerHTML=''; }
+  function showResult(html, isError=false){
+    resultBox.style.display='block';
+    resultBox.className='result'+(isError?' error':'');
     resultBox.innerHTML = String(html);
   }
-
-  function canSendUID(uid) {
+  function canSendUID(uid){
     const data = loadData();
     const last = data.uidTimestamps[uid];
     if (!last) return true;
     return (Date.now() - last) > 24*60*60*1000;
+  }
+
+  // ✅ Verify site before enabling send
+  async function verifySite(){
+    try {
+      const res = await fetch(CHECK_API, {
+        headers: { 'x-site-token': SITE_TOKEN }
+      });
+      const data = await res.json().catch(()=>null);
+      if (!res.ok || !data?.valid) throw new Error(data?.error || 'Unauthorized');
+      return true;
+    } catch(e){
+      showResult('🚫 Unauthorized website access.<br>'+e.message, true);
+      sendBtn.disabled = true;
+      return false;
+    }
   }
 
   sendBtn.addEventListener('click', async function(){
@@ -48,8 +58,11 @@
       return;
     }
 
+    // ✅ Site verification
+    const isVerified = await verifySite();
+    if (!isVerified) return;
+
     let data = loadData();
-    // ensure dailyUsage is a number
     data.dailyUsage = Number(data.dailyUsage) || 0;
 
     if (data.dailyUsage >= MAX_DAILY){
@@ -65,7 +78,7 @@
     sendBtn.disabled = true;
     showResult('⏳ Sending like...');
 
-    const apiURL = `https://apiblogproxy.vercel.app/api/like?uid=${encodeURIComponent(uid)}&server_name=${encodeURIComponent(region)}`;
+    const apiURL = `${LIKE_API}?uid=${encodeURIComponent(uid)}&server_name=${encodeURIComponent(region)}`;
 
     try {
       const res = await fetch(apiURL);
@@ -81,12 +94,10 @@
       } else if (Number(result.LikesGivenByAPI) === 0) {
         showResult('⚠️ This Player Already Got Maximum Likes For Today.', true);
       } else {
-        // increment as number
-        data.dailyUsage = Number(data.dailyUsage || 0) + 1;
+        data.dailyUsage++;
         data.uidTimestamps[uid] = Date.now();
         saveData(data);
 
-        // show with MAX_DAILY constant to guarantee "/3"
         showResult(
           '✅ Like Sent Successfully!<br><br>'+
           '👤 Player: ' + (result.PlayerNickname || "N/A") + '<br>'+
@@ -96,7 +107,7 @@
           '🔋 Total Likes: ' + (result.LikesafterCommand || "N/A") + '<br>'+
           '📊 Daily Usage: ' + data.dailyUsage + '/' + MAX_DAILY + '<br><br>'+
           '🖥️ Powered By: V122'
-        , false);
+        );
       }
     } catch(err){
       showResult('🚨 API Error: '+err.message, true);
