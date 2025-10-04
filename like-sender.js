@@ -3,7 +3,7 @@
   const sendBtn = document.getElementById('sendBtn');
   const resultBox = document.getElementById('result');
   const LS_KEY = 'ff_like_sender_data';
-  const MAX_DAILY = 7; // <-- use this everywhere
+  const MAX_DAILY = 3; // <-- use this everywhere
 
   function loadData() {
     try {
@@ -86,7 +86,7 @@
         data.uidTimestamps[uid] = Date.now();
         saveData(data);
 
-        // show with MAX_DAILY constant to guarantee "/7"
+        // show with MAX_DAILY constant to guarantee "/3"
         showResult(
           '✅ Like Sent Successfully!<br><br>'+
           '👤 Player: ' + (result.PlayerNickname || "N/A") + '<br>'+
