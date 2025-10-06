@@ -1,4 +1,3 @@
-// like-sender.js (Secure version - no token in frontend)
 (function(){
   const sendBtn = document.getElementById('sendBtn');
   const resultBox = document.getElementById('result');
@@ -8,7 +7,6 @@
   const CHECK_API  = 'https://blogger-cheak2.vercel.app/api/check';
   const LIKE_API   = 'https://apiblogproxy.vercel.app/api/like';
 
-  // localStorage data
   function loadData() {
     try {
       let data = localStorage.getItem(LS_KEY);
@@ -36,10 +34,10 @@
     return (Date.now() - last) > 24*60*60*1000;
   }
 
-  // ✅ Verify site before enabling send
+  // ✅ Verify site before enabling send (no token required)
   async function verifySite(){
     try {
-      const res = await fetch(CHECK_API); // no token sent
+      const res = await fetch(CHECK_API);
       const data = await res.json().catch(()=>null);
       if (!res.ok || !data?.valid) throw new Error(data?.error || 'Unauthorized');
       return true;
