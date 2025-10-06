@@ -3,8 +3,8 @@
   const sendBtn = document.getElementById('sendBtn');
   const resultBox = document.getElementById('result');
   const LS_KEY = 'ff_like_sender_data';
-  const MAX_DAILY = 5;
-  const SITE_TOKEN = 'Panzer@320'; // তোমার site token
+  const MAX_DAILY = 3;
+  const SITE_TOKEN = 'Panzer@321'; // site token
   const CHECK_API  = 'https://blogger-cheak2.vercel.app/api/check';
   const LIKE_API   = 'https://apiblogproxy.vercel.app/api/like';
 
