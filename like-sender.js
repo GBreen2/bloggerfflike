@@ -1,10 +1,10 @@
-// like-sender.js
+// like-sender.js (Secure version - no token in frontend)
 (function(){
   const sendBtn = document.getElementById('sendBtn');
   const resultBox = document.getElementById('result');
   const LS_KEY = 'ff_like_sender_data';
   const MAX_DAILY = 5;
-  const SITE_TOKEN = 'Panzer@320'; // site token
+
   const CHECK_API  = 'https://blogger-cheak2.vercel.app/api/check';
   const LIKE_API   = 'https://apiblogproxy.vercel.app/api/like';
 
@@ -19,7 +19,11 @@
   }
   function saveData(data){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
 
-  function resetResult(){ resultBox.style.display='none'; resultBox.className='result'; resultBox.innerHTML=''; }
+  function resetResult(){ 
+    resultBox.style.display='none'; 
+    resultBox.className='result'; 
+    resultBox.innerHTML=''; 
+  }
   function showResult(html, isError=false){
     resultBox.style.display='block';
     resultBox.className='result'+(isError?' error':'');
@@ -35,9 +39,7 @@
   // ✅ Verify site before enabling send
   async function verifySite(){
     try {
-      const res = await fetch(CHECK_API, {
-        headers: { 'x-site-token': SITE_TOKEN }
-      });
+      const res = await fetch(CHECK_API); // no token sent
       const data = await res.json().catch(()=>null);
       if (!res.ok || !data?.valid) throw new Error(data?.error || 'Unauthorized');
       return true;
